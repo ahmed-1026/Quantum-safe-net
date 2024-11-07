@@ -1,7 +1,9 @@
 // src/components/Sidebar.jsx
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 import { SidebarMenuItem } from './SidebarMenuItem';
 import logo from '../../images/logo.png';
+// import { Layout, Users, CreditCard, Server } from 'lucide-react';
 
 import { 
   Layout, Package, Users, CreditCard, Server, 
@@ -9,17 +11,17 @@ import {
 } from 'lucide-react';
 
 const menuItems = [
-  { icon: <Layout size={18} />, text: 'Dashboard' },
-  { icon: <Package size={18} />, text: 'Bulk Batches' },
-  { icon: <Users size={18} />, text: 'Customers' },
-  { icon: <CreditCard size={18} />, text: 'Subscriptions' },
-  { icon: <Server size={18} />, text: 'VPN Servers' },
-  { icon: <Settings size={18} />, text: 'Settings' },
-  { icon: <Bell size={18} />, text: 'Notifications' },
-  { icon: <Link size={18} />, text: 'App Links' },
-  { icon: <Book size={18} />, text: 'Knowledgebase' },
-  { icon: <MessageSquare size={18} />, text: 'Support' },
-  { icon: <List size={18} />, text: 'System Logs' }
+  { icon: <Layout size={18} />, text: 'Dashboard', path: '/dashboard' },
+  { icon: <Package size={18} />, text: 'Bulk Batches', path: '/bulk-batches' },
+  { icon: <Users size={18} />, text: 'Customers', path: '/customers' },
+  { icon: <CreditCard size={18} />, text: 'Subscriptions', path: '/subscriptions' },
+  { icon: <Server size={18} />, text: 'VPN Servers', path: '/vpn-servers' },
+  { icon: <Settings size={18} />, text: 'Settings', path: '/settings' },
+  { icon: <Bell size={18} />, text: 'Notifications', path: '/notifications' },
+  { icon: <Link size={18} />, text: 'App Links', path: '/app-links' },
+  { icon: <Book size={18} />, text: 'Knowledgebase', path: '/knowledgebase' },
+  { icon: <MessageSquare size={18} />, text: 'Support', path: '/support' },
+  { icon: <List size={18} />, text: 'System Logs', path: '/system-logs' }
 ];
 
 export const Sidebar = ({ isOpen, activeIndex, setActiveIndex }) => (
@@ -48,12 +50,14 @@ export const Sidebar = ({ isOpen, activeIndex, setActiveIndex }) => (
 
       <nav className="space-y-1">
         {menuItems.map((item, index) => (
-          <SidebarMenuItem 
-            key={index}
-            {...item}
-            isActive={index === activeIndex}
-            onClick={() => setActiveIndex(index)}
-          />
+          <NavLink 
+            key={index} 
+            to={item.path}
+            className={({ isActive }) => `flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 text-sm ${isActive ? 'bg-gray-100' : ''}`}
+          >
+            {item.icon}
+            <span>{item.text}</span>
+          </NavLink>
         ))}
       </nav>
     </div>
