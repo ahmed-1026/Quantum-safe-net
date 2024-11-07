@@ -22,7 +22,7 @@ const menuItems = [
   { icon: <List size={18} />, text: 'System Logs' }
 ];
 
-export const Sidebar = ({ isOpen }) => (
+export const Sidebar = ({ isOpen, activeIndex, setActiveIndex }) => (
   <div className={`
     fixed lg:static inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 
     transform transition-transform duration-300 ease-in-out
@@ -51,7 +51,8 @@ export const Sidebar = ({ isOpen }) => (
           <SidebarMenuItem 
             key={index}
             {...item}
-            isActive={index === 0}
+            isActive={index === activeIndex}
+            onClick={() => setActiveIndex(index)}
           />
         ))}
       </nav>

@@ -6,6 +6,7 @@ import { SidebarToggle } from './ui/SidebarToggle';
 import { ServerRow } from './ui/ServerRow';
 import { StatsCard } from './ui/StatsCard';
 
+
 const serverData = [
   { name: 'Tokyo', flag: 'jp', users: 0 },
   { name: 'Frankfurt', flag: 'de', users: 0 },
@@ -23,6 +24,7 @@ const stats = [
 
 const Dashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -38,7 +40,7 @@ const Dashboard = () => {
         />
       )}
 
-      <Sidebar isOpen={isSidebarOpen} />
+      <Sidebar isOpen={isSidebarOpen} activeIndex={activeIndex} setActiveIndex={setActiveIndex}  /> 
 
       {/* Main Content */}
       <div className="flex-1">
