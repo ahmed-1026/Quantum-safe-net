@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from "./components/dashboard";
 import { Sidebar } from "./components/ui/Sidebar";
 import { SidebarToggle } from './components/ui/SidebarToggle';
+import LoginPage from "./components/login";
 
 function App() {
   return (
@@ -13,11 +14,62 @@ function App() {
 }
 
 function QuantumSafeNet() {
+
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('isAuthenticated') === 'true'
+  });
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  // // Check token validity on page load
+  // useEffect(() => {
+  //   const token = localStorage.getItem('token');
+  //   const tokenExpiry = localStorage.getItem('tokenExpiry');
+    
+  //   if (token && tokenExpiry) {
+  //     if (Date.now() < parseInt(tokenExpiry)) {
+  //       setIsAuthenticated(true);
+  //     } else {
+  //       // Token expired
+  //       handleLogout();
+  //     }
+  //   }
+  // }, []);
+
+  useEffect(() => {
+    localStorage.setItem('isAuthenticated', isAuthenticated);
+  }, [isAuthenticated]);
+
+// // When logging in
+  // const handleLogin = (token) => {
+  //   const expiryTime = Date.now() + (24 * 60 * 60 * 1000); // 24 hours
+  //   localStorage.setItem('token', token);
+  //   localStorage.setItem('tokenExpiry', expiryTime);
+  //   setIsAuthenticated(true);
+  // };
+
+  const handleLogin = () => {
+      setIsAuthenticated(true);
+    };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem('isAuthenticated');
+    // You might want to redirect to login page here
+  };
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
+// If not authenticated, show only the login page
+  if (!isAuthenticated) {
+    return (
+      <Routes>
+        <Route 
+          path="*" 
+          element={<LoginPage onLogin={handleLogin} />} 
+        />
+      </Routes>
+    );
+  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
