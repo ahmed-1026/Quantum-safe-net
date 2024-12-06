@@ -1,13 +1,13 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import logo from '../../images/logo.png';
 import { 
   Layout, Package, Users, CreditCard, Server, 
-  Settings, Bell, Link, Book, MessageSquare, List 
+  Settings, Bell, Link, Book, MessageSquare, List, Database
 } from 'lucide-react';
 
 const menuItems = [
   { icon: <Layout size={18} />, text: 'Dashboard', path: '/dashboard' },
+  { icon: <Database size={18} />, text: 'Assets', path: '/assets' }, // Change icon to Database
   { icon: <Package size={18} />, text: 'Bulk Batches', path: '/bulk-batches' },
   { icon: <Users size={18} />, text: 'Customers', path: '/customers' },
   { icon: <CreditCard size={18} />, text: 'Subscriptions', path: '/subscriptions' },
