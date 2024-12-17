@@ -9,7 +9,8 @@ import Dashboard from "./components/dashboard";
 import { Sidebar } from "./components/ui/Sidebar";
 import { SidebarToggle } from "./components/ui/SidebarToggle";
 import LoginPage from "./components/login";
-import UserTable from "./components/UserTable";
+import AssetTable from './components/AssetTable'; // Add this import
+
 
 function App() {
   return (
@@ -106,7 +107,7 @@ function QuantumSafeNet() {
             <Routes>
               <Route path="/" element={<Navigate to="/dashboard" />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/users" element={<UserTable />} />{" "}
+              <Route path="/assets" element={<AssetTable />} /> {/* Add this route */}
               {/* Add other routes here */}
             </Routes>
           </div>

@@ -1,37 +1,23 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
-import logo from "../../images/logo.png";
-import {
-  Layout,
-  Package,
-  Users,
-  CreditCard,
-  Server,
-  Settings,
-  Bell,
-  Link,
-  Book,
-  MessageSquare,
-  List,
-} from "lucide-react";
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+import { 
+  Layout, Package, Users, CreditCard, Server, 
+  Settings, Bell, Link, Book, MessageSquare, List, Database
+} from 'lucide-react';
 
 const menuItems = [
-  { icon: <Layout size={18} />, text: "Dashboard", path: "/dashboard" },
-  { icon: <Users size={18} />, text: "Users", path: "/users" }, // Change icon to Database
-  { icon: <Package size={18} />, text: "Bulk Batches", path: "/bulk-batches" },
-  { icon: <Users size={18} />, text: "Customers", path: "/customers" },
-  {
-    icon: <CreditCard size={18} />,
-    text: "Subscriptions",
-    path: "/subscriptions",
-  },
-  { icon: <Server size={18} />, text: "VPN Servers", path: "/vpn-servers" },
-  { icon: <Settings size={18} />, text: "Settings", path: "/settings" },
-  { icon: <Bell size={18} />, text: "Notifications", path: "/notifications" },
-  { icon: <Link size={18} />, text: "App Links", path: "/app-links" },
-  { icon: <Book size={18} />, text: "Knowledgebase", path: "/knowledgebase" },
-  { icon: <MessageSquare size={18} />, text: "Support", path: "/support" },
-  { icon: <List size={18} />, text: "System Logs", path: "/system-logs" },
+  { icon: <Layout size={18} />, text: 'Dashboard', path: '/dashboard' },
+  { icon: <Database size={18} />, text: 'Assets', path: '/assets' }, // Change icon to Database
+  { icon: <Package size={18} />, text: 'Bulk Batches', path: '/bulk-batches' },
+  { icon: <Users size={18} />, text: 'Customers', path: '/customers' },
+  { icon: <CreditCard size={18} />, text: 'Subscriptions', path: '/subscriptions' },
+  { icon: <Server size={18} />, text: 'VPN Servers', path: '/vpn-servers' },
+  { icon: <Settings size={18} />, text: 'Settings', path: '/settings' },
+  { icon: <Bell size={18} />, text: 'Notifications', path: '/notifications' },
+  { icon: <Link size={18} />, text: 'App Links', path: '/app-links' },
+  { icon: <Book size={18} />, text: 'Knowledgebase', path: '/knowledgebase' },
+  { icon: <MessageSquare size={18} />, text: 'Support', path: '/support' },
+  { icon: <List size={18} />, text: 'System Logs', path: '/system-logs' }
 ];
 
 export const Sidebar = ({ isOpen }) => (
