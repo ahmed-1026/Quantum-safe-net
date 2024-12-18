@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import UserModal from "./UserModal"; // Import the UserModal component
-import usersData from "../data/users.json"; // Import the user data from JSON file
+import usersData from "../../data/users.json"; // Import the user data from JSON file
 
 const UserTable = () => {
   const [users, setUsers] = useState([]);

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
 
 const LoginPage = ({ onLogin }) => {
@@ -93,9 +93,9 @@ const LoginPage = ({ onLogin }) => {
         </form>
 
         <p className="text-center mt-4">
-          <a href="#" className="text-gray-500 hover:text-red-500 text-sm">
+          <Link href="#" className="text-gray-500 hover:text-red-500 text-sm">
             Forgot your password?
-          </a>
+          </Link>
         </p>
       </div>
     </div>

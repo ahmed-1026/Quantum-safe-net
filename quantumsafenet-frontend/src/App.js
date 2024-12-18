@@ -5,11 +5,12 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import Dashboard from "./components/dashboard";
-import { Sidebar } from "./components/ui/Sidebar";
-import { SidebarToggle } from "./components/ui/SidebarToggle";
-import LoginPage from "./components/login";
-import UserTable from "./components/UserTable";
+import Dashboard from "./pages/Dashboard/dashboard";
+import { Sidebar } from "./components/Sidebar/Sidebar";
+import { SidebarToggle } from "./components/Sidebar/SidebarToggle";
+import LoginPage from "./pages/Login/login";
+import UserTable from "./components/User/UserTable";
+import AssetTable from './components/Asset/AssetTable';
 
 function App() {
   return (
@@ -56,11 +57,11 @@ function QuantumSafeNet() {
     setIsAuthenticated(true);
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem("isAuthenticated");
-    // You might want to redirect to login page here
-  };
+  // const handleLogout = () => {
+  //   setIsAuthenticated(false);
+  //   localStorage.removeItem("isAuthenticated");
+  //   // You might want to redirect to login page here
+  // };
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
@@ -107,6 +108,7 @@ function QuantumSafeNet() {
               <Route path="/" element={<Navigate to="/dashboard" />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/users" element={<UserTable />} />{" "}
+              <Route path="/assets" element={<AssetTable />} />
               {/* Add other routes here */}
             </Routes>
           </div>
