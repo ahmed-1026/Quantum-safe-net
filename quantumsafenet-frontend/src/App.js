@@ -11,6 +11,8 @@ import { SidebarToggle } from "./components/Sidebar/SidebarToggle";
 import LoginPage from "./pages/Login/login";
 import UserTable from "./components/User/UserTable";
 import AssetTable from './components/Asset/AssetTable';
+import Chatbot from "./components/Chatbot/chatbot";
+
 
 function App() {
   return (
@@ -114,6 +116,7 @@ function QuantumSafeNet() {
           </div>
         </main>
       </div>
+      <Chatbot/>
     </div>
   );
 }
