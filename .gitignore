@@ -1,5 +1,7 @@
 /Fyp Plane.docx
 
 ./quantumsafenet-frontend/node_modules
+quantumsafenet-backend/venv
+*.pyc
 
 Resouces/
