@@ -18,7 +18,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         response = requests.post(
             f"{wg_manager_url}/vpn/users",
             params={
-            "client_name": "admin",
+            "client_name": obj_in.full_name,
             "wg_config_path": "/etc/wireguard/wg0.conf",
             "server_pub_ip": "192.168.1.1",
             "server_port": 51820,
@@ -35,6 +35,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
             email=obj_in.email,
             password=get_password_hash(obj_in.password),
             full_name=obj_in.full_name,
+            role=obj_in.role,
             vpnconfig=config_path
         )
         db.add(db_obj)
@@ -65,6 +66,22 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
 
     def is_active(self, user: User) -> bool:
         return user.is_active
+    
+    def remove(self, db, *, id):
+        user = self.get(db, id=id)
+        wg_manager_url = settings.WIREGUARD_MANAGER_URL
+        response = requests.delete(
+            f"{wg_manager_url}/vpn/users",
+            params={
+            "client_name": user.full_name,
+            "wg_config_path": user.vpnconfig
+            },
+            headers={"accept": "application/json"},
+            data={}
+        )
+        if response.status_code != 200:
+            raise Exception(f"Failed to delete user: {response.text}")
+        return super().remove(db, id=id)
 
 
 

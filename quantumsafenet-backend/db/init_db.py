@@ -13,10 +13,11 @@ def init_db(db: Session) -> None:
 
     user = crud_user.get_by_email(db, email=settings.FIRST_SUPERUSER)
     if not user:
-        input("Creating superuser")
         user_in = schemas_user.UserCreate(
             email=settings.FIRST_SUPERUSER,
+            full_name='Admin',
             password=settings.FIRST_SUPERUSER_PASSWORD,
+            role='admin'
         )
         user = crud_user.create(db, obj_in=user_in)
 

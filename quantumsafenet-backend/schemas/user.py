@@ -9,10 +9,6 @@ class UserBase(BaseModel):
     is_active: Optional[bool] = True
     full_name: Optional[str] = None
     role: Optional[str] = None
-    trustscore: Optional[int] = 0
-    location: Optional[str] = None
-    vpnconfig: Optional[str] = None
-    assets: Optional[str] = None
 
 
 # Properties to receive via API on creation
@@ -23,11 +19,19 @@ class UserCreate(UserBase):
 
 # Properties to receive via API on update
 class UserUpdate(UserBase):
+    location: Optional[str] = None
+    vpnconfig: Optional[str] = None
+    trustscore: Optional[int] = 0
+    assets: Optional[str] = None
     password: Optional[str] = None
 
 
 class UserInDBBase(UserBase):
     id: int
+    location: Optional[str] = None
+    vpnconfig: Optional[str] = None
+    trustscore: Optional[int] = 0
+    assets: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -40,4 +44,4 @@ class User(UserInDBBase):
 
 # Additional properties stored in DB
 class UserInDB(UserInDBBase):
-    hashed_password: str
+    password: str
