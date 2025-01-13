@@ -110,12 +110,12 @@ function installConfs() {
     echo "Detected public IP: ${SERVER_PUB_IP}"
 
     # Detect public interface
-    SERVER_NIC="$(ip -4 route ls | grep default | grep -Po '(?<=dev )(\S+)' | head -1)"
-    if [[ -z ${SERVER_NIC} ]]; then
+    SERVER_PUB_NIC="$(ip -4 route ls | grep default | grep -Po '(?<=dev )(\S+)' | head -1)"
+    if [[ -z ${SERVER_PUB_NIC} ]]; then
         echo "Error: Unable to detect public network interface. Exiting."
         exit 1
     fi
-    echo "Detected public interface: ${SERVER_NIC}"
+    echo "Detected public interface: ${SERVER_PUB_NIC}"
 
     # Set defaults
     SERVER_WG_NIC="wg0"
@@ -130,7 +130,7 @@ function installConfs() {
     echo ""
     echo "Configuration Summary:"
     echo "Public IP Address: ${SERVER_PUB_IP}"
-    echo "Public Network Interface: ${SERVER_NIC}"
+    echo "Public Network Interface: ${SERVER_PUB_NIC}"
     echo "WireGuard Interface Name: ${SERVER_WG_NIC}"
     echo "WireGuard Server IPv4: ${SERVER_WG_IPV4}"
     echo "WireGuard Server IPv6: ${SERVER_WG_IPV6}"
