@@ -1,7 +1,10 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import StreamingResponse
 import re
 import subprocess
 import os
+import qrcode
+from io import BytesIO
 
 app = FastAPI()
 
@@ -154,6 +157,44 @@ def delete_client(client_name, wg_config_path="/etc/wireguard/wg0.conf"):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
+@app.post("/generate-qr")
+async def generate_qr(file_path: str):
+    try:
+        # Parse the JSON request body
+        with open(file_path, "r") as f:
+            client_config = f.read()
+
+        if not client_config:
+            raise HTTPException(status_code=400, detail="client_config is required")
+
+        # Generate the QR code
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(client_config)
+        qr.make(fit=True)
+
+        # Create an image of the QR code
+        img = qr.make_image(fill_color="black", back_color="white")
+
+        # Save the QR code to a BytesIO stream
+        img_io = BytesIO()
+        img.save(img_io, format="PNG")
+        img_io.seek(0)
+
+        # Return the QR code image as a streaming response
+        return StreamingResponse(
+            img_io,
+            media_type="image/png",
+            headers={"Content-Disposition": "attachment; filename=wg_client_qr.png"}
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
 if __name__ == "__main__":
     import uvicorn
 
