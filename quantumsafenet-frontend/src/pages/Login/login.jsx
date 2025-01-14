@@ -1,17 +1,48 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
+import { login } from '../../apiService';
 
 const LoginPage = ({ onLogin }) => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onLogin();
-    navigate('/dashboard');
+    if (!email || !password) {
+      setError('Email and password are required.');
+      return;
+    }
+
+    setError('');
+    setLoading(true);
+    try {
+      // Call the login API
+      const response = await login({email, password});
+      console.log("response", response)
+      // Assuming the API response contains a token
+      if (response?.data?.access_token) {
+        // Store token in localStorage or context for future requests
+        localStorage.setItem('authToken', response?.data?.access_token);
+
+        // Navigate to the dashboard
+        onLogin();
+        navigate('/dashboard');
+      } else {
+        // Handle unexpected API response
+        const message = response?.response?.data?.detail;
+        setError('Login failed. Please try again.');
+      }
+    } catch (err) {
+      // Handle API errors
+      setError(err.response?.data?.message || 'An error occurred. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
