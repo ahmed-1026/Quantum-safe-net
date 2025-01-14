@@ -5,3 +5,9 @@ quantumsafenet-backend/venv
 *.pyc
 
 Resouces/
+
+IDPS/.cache
+
+IDPS/.huggingface
+
+IDPS/venv
