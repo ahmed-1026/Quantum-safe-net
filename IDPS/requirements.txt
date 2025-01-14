@@ -1,0 +1,7 @@
+huggingface_hub
+joblib
+flask
+flask-ngrok
+pyngrok
+threading
+pandas
