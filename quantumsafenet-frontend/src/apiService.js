@@ -1,14 +1,33 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: "https://2e6c-111-68-102-12.ngrok-free.app",
+  baseURL: "http://67.205.164.192:8000/",
+});
+
+const vpnapi = axios.create({
+  baseURL: "http://67.205.164.192:8002/",
 });
 
 // Example: Fetch data
 export const getData = async (endpoint) => {
   try {
-    const response = await api.get(endpoint);
-    return response.data;
+    const token = localStorage.getItem('authToken');
+    const response = await api.get(endpoint, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error('API GET Error:', error);
+    throw error;
+  }
+};
+
+export const getVpnData = async (endpoint, path) => {
+  try {
+    const response = await vpnapi.post(endpoint+"?file_path="+path, {responseType: 'arraybuffer'});
+    return response;
   } catch (error) {
     console.error('API GET Error:', error);
     throw error;

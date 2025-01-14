@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
+from starlette.middleware.cors import CORSMiddleware
 import re
 import subprocess
 import os
@@ -7,6 +8,14 @@ import qrcode
 from io import BytesIO
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/vpn/users")
 def list_clients(wg_config_path="/etc/wireguard/wg0.conf"):
@@ -185,12 +194,16 @@ async def generate_qr(file_path: str):
         img.save(img_io, format="PNG")
         img_io.seek(0)
 
-        # Return the QR code image as a streaming response
-        return StreamingResponse(
-            img_io,
-            media_type="image/png",
-            headers={"Content-Disposition": "attachment; filename=wg_client_qr.png"}
-        )
+        import base64
+        img_base64 = base64.b64encode(img_io.getvalue()).decode('utf-8')
+        return JSONResponse(content={"qr_code_base64": f"data:image/png;base64,{img_base64}"})
+
+        # # Return the QR code image as a streaming response
+        # return StreamingResponse(
+        #     img_io,
+        #     media_type="image/png",
+        #     headers={"Content-Disposition": "attachment; filename=wg_client_qr.png"}
+        # )
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
