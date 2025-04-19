@@ -55,7 +55,7 @@ const Chatbot = () => {
     
             // Changed from response.json() to response.text()
             const data = await response.text();
-            return data.replace(/\\n/g, '').replace(/"/g, '');
+            return data;
             
         } catch (error) {
             console.error('Error:', error);
