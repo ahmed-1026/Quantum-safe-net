@@ -11,3 +11,5 @@ IDPS/.cache
 IDPS/.huggingface
 
 IDPS/venv
+
+Chat-bot/config.json

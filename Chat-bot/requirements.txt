@@ -1,3 +1,5 @@
-google-generativeai
 fastapi
 uvicorn
+qdrant_client
+sentence_transformers
+openai

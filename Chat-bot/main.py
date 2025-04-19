@@ -1,8 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import google.generativeai as genai
-gemini_api_key = "AIzaSyC2P0cST5Nd72EvOvUffIYJaDddjXyvirw"
+from qdrant_client import QdrantClient
+from sentence_transformers import SentenceTransformer
+from openai import OpenAI
+import json
 
+with open('config.json', 'r') as file:
+    config = json.load(file)
 
 app = FastAPI()
 
@@ -24,61 +28,77 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-genai.configure(api_key=gemini_api_key)
 
-# Set up the model
-generation_config = {
-    "temperature": 1,
-    "top_p": 0.95,
-    "top_k": 0,
-    "max_output_tokens": 8192,
-}
-
-safety_settings = [
-    {
-        "category": "HARM_CATEGORY_HARASSMENT",
-        "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-    },
-    {
-        "category": "HARM_CATEGORY_HATE_SPEECH",
-        "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-    },
-    {
-        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-        "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-    },
-    {
-        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-        "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-    },
-]
-system_instruction = (
-    "You are an AI assistant for QuantumSafeNet, a secure and AI-driven virtual network solution for remote access. "
-    "Your role is to provide professional support to users, offering insights on secure remote access, encryption, AI-based threat detection, "
-    "post-quantum cryptography, geo-location filtering, and blockchain-based secure audits. If you do not have sufficient information to answer a user's question, "
-    "please respond with 'I don't know.' Always maintain a professional and helpful tone. "
-    "When responding to a user query, structure your response as valid, semantic HTML. Use appropriate tags like <p> for paragraphs, <strong> for bold text, "
-    "<em> for italic text, <ul>/<li> for lists, and <a> for links. Ensure the HTML is well-formed and ready to be rendered directly on a webpage. "
-    "Responses should not contain raw formatting characters like *, _, or \\n. "
-    "Line breaks should only be represented by semantic HTML tags such as <br> or the appropriate paragraph structure. "
-    "Your responses should be concise, user-friendly, and visually organized when rendered as HTML."
+qdrant_client = QdrantClient(
+    url=config['qdrant_url'], 
+    api_key=config['qdrant_api_key'],
 )
 
-model = genai.GenerativeModel(model_name="gemini-1.5-pro-latest",
-                              generation_config=generation_config,
-                              system_instruction=system_instruction,
-                              safety_settings=safety_settings)
+client = OpenAI(
+  base_url = "https://integrate.api.nvidia.com/v1",
+  api_key = config["openai_api_key"]
+)
 
-convo = model.start_chat(history=[])
+def get_sentenceTF_embeddings(sentences):
+  model = SentenceTransformer('all-MiniLM-L6-v2')
+  embeddings =[]
+  for chunk in sentences:
+    embeddings.append(model.encode(chunk))
+  print(len(embeddings))
+  return embeddings
 
+def custom_prompt(query: str, results):
+    # Extract the page content from the results
+    source_knowledge = "\n".join([x.payload['text'] for x in results])
+    
+    # Create the augmented prompt
+    augment_prompt = f"""Using the contexts below, answer the query in short paragraph:
+
+    Contexts:
+    {source_knowledge}
+
+    Query: {query}"""
+    
+    return augment_prompt
 
 @app.get("/")
 def chat(message: str):
-    convo.send_message(message)
-    response = convo.last.text
-    html_response = response.replace('* ', '')
+    # print(message)
+    query = [message]
+    query_embedding_response = get_sentenceTF_embeddings(query)
+    
+    # Assuming query_embedding_response is a list of lists or a NumPy array
+    query_embedding = query_embedding_response[0].tolist()  # Convert to list if necessary
+    
+    # print(qdrant_client.get_collections())
 
-    return html_response
+    # Perform similarity search
+    results = qdrant_client.search(
+        collection_name="quantumsafenetbot",
+        query_vector=query_embedding,
+    )
+    
+    messages = []
+    # messages.append({"role":"assistant", "content": full_response})
+    prompt = {"role":"system", "content": custom_prompt(query, results)}
+    messages.append(prompt)
+
+    res = client.chat.completions.create(
+    model="meta/llama-3.1-8b-instruct",
+    messages=messages,
+    temperature=0.2,
+    top_p=0.7,
+    max_tokens=1024,
+    stream=True
+    )
+
+    full_response = ""
+    for chunk in res:
+        if chunk.choices[0].delta.content is not None:
+            full_response += chunk.choices[0].delta.content
+    print(full_response)
+    return full_response
+
 
 
 if __name__ == "__main__":
