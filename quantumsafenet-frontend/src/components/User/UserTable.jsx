@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { QRCodeCanvas } from "qrcode.react";
 import { FaEdit, FaTrash, FaQrcode } from "react-icons/fa";
 import UserModal from "./UserModal";
-import { getData, getVpnData } from "../../apiService";
+import { getData, getVpnData, deleteUser } from "../../apiService";
 
 const UserTable = () => {
   const [users, setUsers] = useState([]);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
-  const [qrImage, setQrImage] = useState(null);
+  const [config, setConfig] = useState(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -37,21 +38,30 @@ const UserTable = () => {
   };
 
   const handleDelete = (id) => {
-    setUsers(users.filter((user) => user.id !== id));
+    try {
+      deleteUser(id);
+      setUsers(users.filter((user) => user.id !== id));
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      alert('Failed to delete user. Please try again.');
+    }
   };
 
-  const handleQr = async (path) => {
+  const handleConfig = async (path) => {
     try {
-      const response = await getVpnData('/generate-qr', path);
+      const response = await getVpnData('/config', path);
       console.log("Base64 Image: ", response); // For debugging
-      setQrImage(response.data.qr_code_base64);
+      console.log("Config: ", response.data.config_base64); // For debugging
+      setConfig(response.data.config_base64);
+      console.log("Config: ", config); // For debugging
       setIsImageModalOpen(true);
     } catch (error) {
-      console.error('Error fetching QR code:', error);
+      console.error('Error fetching Config:', error);
     }
   };
 
   const handleSubmit = (user) => {
+    console.log("User submitted: ", user);
     if (user.id) {
       // Update existing asset
       setUsers(users.map((u) => (u.id === user.id ? user : u)));
@@ -109,7 +119,7 @@ const UserTable = () => {
                 <td className="py-3 px-4">{user.location}</td>
                 <td className="py-3 px-4">{user.trustscore}</td>
                 <td className="py-3 px-4">
-                  <button className="mr-2" onClick={() => handleQr(user.vpnconfig)}>
+                  <button className="mr-2" onClick={() => handleConfig(user.vpnconfig)}>
                     <FaQrcode className="text-blue-500" />
                   </button>
                   <button className="mr-2" onClick={() => handleEdit(user)}>
@@ -126,13 +136,13 @@ const UserTable = () => {
       ) : (
         <div className="p-4 text-center text-gray-500">No users found.</div>
       )}
-      {/* {isModalOpen && (
+      {isModalOpen && (
         <UserModal
           user={currentUser}
           onClose={() => setIsModalOpen(false)}
           onSubmit={handleSubmit}
         />
-      )} */}
+      )}
 
       {/* Image Modal */}
       {isImageModalOpen && (
@@ -141,12 +151,13 @@ const UserTable = () => {
           onClick={() => setIsImageModalOpen(false)} // Close modal on click outside
         >
           <div className="bg-white p-4 rounded-lg" onClick={(e) => e.stopPropagation()}>
-            <img
-              src={qrImage}
-              alt="QR Code"
-              className="max-w-full max-h-full"
-              style={{ width: "300px", height: "300px" }}
-            />
+          <QRCodeCanvas
+            value={config}
+            size={300}
+            bgColor="#ffffff"
+            fgColor="#000000"
+            level="H"
+          />
             <button
               className="bg-red-500 text-white px-4 py-2 mt-4 rounded-md hover:bg-red-600"
               onClick={() => setIsImageModalOpen(false)}

@@ -6,6 +6,7 @@ import subprocess
 import os
 import qrcode
 from io import BytesIO
+import base64
 
 app = FastAPI()
 
@@ -44,7 +45,7 @@ def list_clients(wg_config_path="/etc/wireguard/wg0.conf"):
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 @app.post("/vpn/users")
-def new_client(client_name, wg_config_path="/etc/wireguard/wg0.conf", server_pub_ip="192.168.1.1", server_port="51820", dns=("1.1.1.1", "1.0.0.1")):
+def new_client(client_name, wg_config_path="/etc/wireguard/wg0.conf"):
     """
     Create a new WireGuard client.
     :param client_name: Name of the new client.
@@ -53,6 +54,22 @@ def new_client(client_name, wg_config_path="/etc/wireguard/wg0.conf", server_pub
     :param server_port: Port on which WireGuard server listens.
     :param dns: Tuple of DNS servers for the client.
     """
+    dns=("1.1.1.1", "1.0.0.1")
+    server_pub_ip = "134.122.115.78"
+    server_port = 51820
+    print("Creating new client...", client_name, server_pub_ip, server_port, dns)
+    server_params_path = "/etc/wireguard/params"
+    server_pub_key = None
+    try:
+        with open(server_params_path, "r") as f:
+            for line in f:
+                if line.startswith("SERVER_PUB_KEY="):
+                    server_pub_key = line.strip().split("=", 1)[1]
+                    break
+        if not server_pub_key:
+            raise HTTPException(status_code=500, detail="SERVER_PUB_KEY not found in params file.")
+    except FileNotFoundError:
+        raise HTTPException(status_code=500, detail=f"WireGuard params file not found at {server_params_path}")
     if not re.match(r"^[a-zA-Z0-9_-]{1,15}$", client_name):
         raise HTTPException(status_code=400, detail="Client name must be alphanumeric, can include underscores or dashes, and be no longer than 15 characters.")
 
@@ -75,7 +92,9 @@ def new_client(client_name, wg_config_path="/etc/wireguard/wg0.conf", server_pub
 
     # Generate keys for the client
     client_priv_key = subprocess.check_output(["wg", "genkey"], text=True).strip()
-    client_pub_key = subprocess.check_output(["echo", client_priv_key, "|", "wg", "pubkey"], text=True, shell=True).strip()
+    pubkey_process = subprocess.Popen(["wg", "pubkey"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
+    client_pub_key, _ = pubkey_process.communicate(input=client_priv_key)
+    client_pub_key = client_pub_key.strip()
     client_pre_shared_key = subprocess.check_output(["wg", "genpsk"], text=True).strip()
 
     # Find an available IPv4 address
@@ -98,7 +117,7 @@ Address = {client_wg_ipv4}/32,{client_wg_ipv6}/128
 DNS = {dns[0]},{dns[1]}
 
 [Peer]
-PublicKey = <SERVER_PUBLIC_KEY_PLACEHOLDER>
+PublicKey = {server_pub_key}
 PresharedKey = {client_pre_shared_key}
 Endpoint = {endpoint}
 AllowedIPs = 0.0.0.0/0,::/0
@@ -124,6 +143,8 @@ AllowedIPs = {client_wg_ipv4}/32,{client_wg_ipv6}/128
 
     # Reload WireGuard configuration
     subprocess.run(["wg", "syncconf", "wg0", f"<(wg-quick strip wg0)"], shell=True, check=True)
+    # # Alternate:
+    # subprocess.run("wg syncconf wg0 <(wg-quick strip wg0)", shell=True, executable="/bin/bash", check=True)
 
     return {"message": f"Client configuration saved at: {client_config_path}"}
 
@@ -156,6 +177,12 @@ def delete_client(client_name, wg_config_path="/etc/wireguard/wg0.conf"):
         with open(wg_config_path, "w") as f:
             f.write("".join(new_lines))
 
+        # Remove the client's configuration file
+        try:
+            os.remove(f"/home/{client_name}/wg0-client-{client_name}.conf")
+        except FileNotFoundError:
+            pass
+
         # Reload WireGuard configuration
         subprocess.run(["wg", "syncconf", "wg0", f"<(wg-quick strip wg0)"], shell=True, check=True)
 
@@ -166,8 +193,8 @@ def delete_client(client_name, wg_config_path="/etc/wireguard/wg0.conf"):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
-@app.post("/generate-qr")
-async def generate_qr(file_path: str):
+@app.post("/config")
+async def get_config(file_path: str):
     try:
         # Parse the JSON request body
         with open(file_path, "r") as f:
@@ -176,35 +203,9 @@ async def generate_qr(file_path: str):
         if not client_config:
             raise HTTPException(status_code=400, detail="client_config is required")
 
-        # Generate the QR code
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=10,
-            border=4,
-        )
-        qr.add_data(client_config)
-        qr.make(fit=True)
-
-        # Create an image of the QR code
-        img = qr.make_image(fill_color="black", back_color="white")
-
-        # Save the QR code to a BytesIO stream
-        img_io = BytesIO()
-        img.save(img_io, format="PNG")
-        img_io.seek(0)
-
-        import base64
-        img_base64 = base64.b64encode(img_io.getvalue()).decode('utf-8')
-        return JSONResponse(content={"qr_code_base64": f"data:image/png;base64,{img_base64}"})
-
-        # # Return the QR code image as a streaming response
-        # return StreamingResponse(
-        #     img_io,
-        #     media_type="image/png",
-        #     headers={"Content-Disposition": "attachment; filename=wg_client_qr.png"}
-        # )
-
+        base64_config = client_config
+        
+        return JSONResponse(content={"config_base64": f"{base64_config}"})
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     

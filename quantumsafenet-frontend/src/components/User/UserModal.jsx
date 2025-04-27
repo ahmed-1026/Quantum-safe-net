@@ -1,25 +1,14 @@
 import React, { useState, useEffect } from "react";
+import { createUser } from "../../apiService";
 
 const UserModal = ({ user, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
-    id: "",
-    role: "Admin",
-    username: "",
-    emailId: "",
-    user_status: "isActive",
-    account_status: "Blocked",
-    account_verify: "Verified",
-    user_assets: "",
-    physicalLocation: "",
-    expiryDate: "",
-    credentials: "",
-    encryptionDetails: "",
-    dateAdded: "",
-    lastUpdated: "",
-    maintenanceSchedule: "",
-    geographicZone: "",
-    hardwareSpecifications: "",
-    bandwidthLimitations: "",
+    // id: "",
+    role: "admin",
+    full_name: "",
+    email: "",
+    is_active: true,
+    password: ""
   });
 
   useEffect(() => {
@@ -33,11 +22,12 @@ const UserModal = ({ user, onClose, onSubmit }) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (u) => {
+  const handleSubmit = async (u) => {
     u.preventDefault();
-    onSubmit(formData);
+    const createdUser = await createUser(formData);
+    onSubmit(createdUser);
   };
-  console.log("Current formData:", formData);
+  // console.log("Current formData:", formData);
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md max-h-full overflow-y-auto">
@@ -60,23 +50,23 @@ const UserModal = ({ user, onClose, onSubmit }) => {
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               required
             >
-              <option value="Admin">Admin</option>
-              <option value="Customer">Customer</option>
-              <option value="Guest">Guest</option>
+              <option value="admin">Admin</option>
+              <option value="employee">Employee</option>
+              <option value="guest">Guest</option>
             </select>
           </div>
           <div>
             <label
-              htmlFor="username"
+              htmlFor="full_name"
               className="block text-sm font-medium text-gray-700"
             >
               User Name
             </label>
             <input
               type="text"
-              id="username"
-              name="username"
-              value={formData.username}
+              id="full_name"
+              name="full_name"
+              value={formData.full_name}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               required
@@ -84,16 +74,16 @@ const UserModal = ({ user, onClose, onSubmit }) => {
           </div>
           <div>
             <label
-              htmlFor="emailId"
+              htmlFor="email"
               className="block text-sm font-medium text-gray-700"
             >
-              EmailId
+              Email
             </label>
             <input
               type="text"
-              id="emailId"
-              name="emailId"
-              value={formData.emailId}
+              id="email"
+              name="email"
+              value={formData.email}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               required
@@ -101,25 +91,29 @@ const UserModal = ({ user, onClose, onSubmit }) => {
           </div>
           <div>
             <label
-              htmlFor="user_status"
+              htmlFor="is_active"
               className="block text-sm font-medium text-gray-700"
             >
               User Status
             </label>
             <select
-              id="user_status"
-              name="user_status"
-              value={formData.user_status}
-              onChange={handleChange}
+              id="is_active"
+              name="is_active"
+              value={formData.is_active}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  is_active: e.target.value === "true",
+                }))
+              }
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
               required
             >
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-              <option value="Maintenance">Maintenance</option>
+              <option value="true">Active</option>
+              <option value="false">Inactive</option>
             </select>
           </div>
-          <div>
+          {/* <div>
             <label
               htmlFor="account_status"
               className="block text-sm font-medium text-gray-700"
@@ -137,8 +131,8 @@ const UserModal = ({ user, onClose, onSubmit }) => {
               <option value="Blocked">Blocked</option>
               <option value="Active">Active</option>
             </select>
-          </div>
-          <div>
+          </div> */}
+          {/* <div>
             <label
               htmlFor="account_verify"
               className="block text-sm font-medium text-gray-700"
@@ -172,7 +166,6 @@ const UserModal = ({ user, onClose, onSubmit }) => {
               value={formData.user_assets}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              required
             />
           </div>
           <div>
@@ -189,7 +182,6 @@ const UserModal = ({ user, onClose, onSubmit }) => {
               value={formData.credentials}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              required
             />
           </div>
           <div>
@@ -206,7 +198,6 @@ const UserModal = ({ user, onClose, onSubmit }) => {
               value={formData.encryptionDetails}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              required
             />
           </div>
           <div>
@@ -223,7 +214,6 @@ const UserModal = ({ user, onClose, onSubmit }) => {
               value={formData.dateAdded}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              required
             />
           </div>
           <div>
@@ -240,7 +230,6 @@ const UserModal = ({ user, onClose, onSubmit }) => {
               value={formData.lastUpdated}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              required
             />
           </div>
           <div>
@@ -257,7 +246,6 @@ const UserModal = ({ user, onClose, onSubmit }) => {
               value={formData.expiryDate}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              required
             />
           </div>
           <div>
@@ -274,7 +262,6 @@ const UserModal = ({ user, onClose, onSubmit }) => {
               value={formData.maintenanceSchedule}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              required
             />
           </div>
           <div>
@@ -291,7 +278,6 @@ const UserModal = ({ user, onClose, onSubmit }) => {
               value={formData.physicalLocation}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              required
             />
           </div>
           <div>
@@ -308,7 +294,6 @@ const UserModal = ({ user, onClose, onSubmit }) => {
               value={formData.geographicZone}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              required
             />
           </div>
           <div>
@@ -325,7 +310,6 @@ const UserModal = ({ user, onClose, onSubmit }) => {
               value={formData.hardwareSpecifications}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              required
             />
           </div>
           <div>
@@ -342,9 +326,8 @@ const UserModal = ({ user, onClose, onSubmit }) => {
               value={formData.bandwidthLimitations}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              required
             />
-          </div>
+          </div> */}
           <div className="flex justify-end space-x-2">
             <button
               type="button"

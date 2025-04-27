@@ -121,7 +121,7 @@ function installConfs() {
     SERVER_WG_NIC="wg0"
     SERVER_WG_IPV4="10.66.66.1"
     SERVER_WG_IPV6="fd42:42:42::1"
-    SERVER_PORT=$(shuf -i49152-65535 -n1)
+    SERVER_PORT=51820
     CLIENT_DNS_1="1.1.1.1"
     CLIENT_DNS_2="1.0.0.1"
     ALLOWED_IPS="0.0.0.0/0,::/0"

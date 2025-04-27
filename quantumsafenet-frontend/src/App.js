@@ -28,42 +28,41 @@ function QuantumSafeNet() {
   });
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  // // Check token validity on page load
-  // useEffect(() => {
-  //   const token = localStorage.getItem('token');
-  //   const tokenExpiry = localStorage.getItem('tokenExpiry');
+  // Check token validity on page load
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    const tokenExpiry = localStorage.getItem('tokenExpiry');
 
-  //   if (token && tokenExpiry) {
-  //     if (Date.now() < parseInt(tokenExpiry)) {
-  //       setIsAuthenticated(true);
-  //     } else {
-  //       // Token expired
-  //       handleLogout();
-  //     }
-  //   }
-  // }, []);
+    if (token && tokenExpiry) {
+      if (Date.now() < parseInt(tokenExpiry)) {
+        setIsAuthenticated(true);
+      } else {
+        // Token expired
+        handleLogout();
+      }
+    }
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("isAuthenticated", isAuthenticated);
   }, [isAuthenticated]);
 
-  // // When logging in
-  // const handleLogin = (token) => {
-  //   const expiryTime = Date.now() + (24 * 60 * 60 * 1000); // 24 hours
-  //   localStorage.setItem('token', token);
-  //   localStorage.setItem('tokenExpiry', expiryTime);
-  //   setIsAuthenticated(true);
-  // };
-
+  // When logging in
   const handleLogin = () => {
+    const expiryTime = Date.now() + (24 * 60 * 60 * 1000); // 24 hours
+    localStorage.setItem('tokenExpiry', expiryTime);
     setIsAuthenticated(true);
   };
 
-  // const handleLogout = () => {
-  //   setIsAuthenticated(false);
-  //   localStorage.removeItem("isAuthenticated");
-  //   // You might want to redirect to login page here
+  // const handleLogin = () => {
+  //   setIsAuthenticated(true);
   // };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem("isAuthenticated");
+    // You might want to redirect to login page here
+  };
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 

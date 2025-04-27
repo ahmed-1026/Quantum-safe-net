@@ -1,11 +1,11 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: "http://67.205.164.192:8000/",
+  baseURL: "http://134.122.115.78:8000/",
 });
 
 const vpnapi = axios.create({
-  baseURL: "http://67.205.164.192:8002/",
+  baseURL: "http://134.122.115.78:8002/",
 });
 
 // Example: Fetch data
@@ -20,6 +20,43 @@ export const getData = async (endpoint) => {
     return response;
   } catch (error) {
     console.error('API GET Error:', error);
+    const status = error?.response?.status;
+    console.log("Error status: ", status)
+    console.log("Error message: ", error?.response)
+    if (status === 401 || status === 403) {
+      handleUnauthorized();
+    }
+  }
+};
+
+export const createUser = async (userData) => {
+  try {
+    console.log("User data: ", userData);
+    const token = localStorage.getItem('authToken');
+    const response = await api.post("/user", userData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error creating user:", error.response?.data || error.message);
+    // throw error;
+  }
+};
+
+export const deleteUser = async (userId) => {
+  try {
+    const token = localStorage.getItem('authToken');
+    const response = await api.delete(`/user/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting user:', error.response?.data || error.message);
     throw error;
   }
 };
@@ -70,4 +107,10 @@ export const login = async (creds) => {
     }
   };
 
+const handleUnauthorized = () => {
+  localStorage.removeItem('AuthToken');
+  localStorage.removeItem('tokenExpiry');
+  localStorage.setItem("isAuthenticated", "false");
+  window.location.href = '/';  // Redirect to login
+};
 export default api;
