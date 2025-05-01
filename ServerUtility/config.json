@@ -1,0 +1,28 @@
+{
+    "rabbitmq": {
+        "host": "134.122.115.78",
+        "port": "5672",
+        "username": "admin",
+        "password": "admin@123",
+        "publisher": {
+            "exchange": "monitor_exchange",
+            "queue": "system_metrics_queue",
+            "routing_key": "system_metrics"
+        }
+    },
+    "socket_server": "http://134.122.115.78",
+    "server": {
+        "ip": "134.122.115.78"
+    },
+    "services": [
+    	{
+		    "name": "wg-quick@wg0.service",
+            "port": 51820,
+            "type": "wireguard"
+	    }
+    ],
+    "updates": {
+        "binaryUrl": "http://134.122.115.78/main-ubuntu-24.04",
+        "versionUrl": "http://134.122.115.78/version.txt"
+    }
+}

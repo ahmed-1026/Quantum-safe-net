@@ -1,2 +1,2 @@
 from .base_class import Base
-from ..models.User import User
+from ..models import User, WGKey, Server

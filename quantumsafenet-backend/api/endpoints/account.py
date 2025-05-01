@@ -20,7 +20,7 @@ def read_user_me(
     """
     Get current user.
     """
-    return current_user
+    return schemas.User.model_validate(current_user)
 
 @router.put("/me", response_model=schemas.User)
 def update_user_me(

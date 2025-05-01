@@ -1,18 +1,38 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: "http://134.122.115.78:8000/",
+  // baseURL: "http://134.122.115.78:8000/",
+  baseURL: "http://127.0.0.1:8000/",
 });
 
 const vpnapi = axios.create({
   baseURL: "http://134.122.115.78:8002/",
 });
 
-// Example: Fetch data
 export const getData = async (endpoint) => {
   try {
     const token = localStorage.getItem('authToken');
     const response = await api.get(endpoint, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error('API GET Error:', error);
+    const status = error?.response?.status;
+    console.log("Error status: ", status)
+    console.log("Error message: ", error?.response)
+    if (status === 401 || status === 403) {
+      handleUnauthorized();
+    }
+  }
+};
+
+export const postData = async (endpoint, data) => {
+  try {
+    const token = localStorage.getItem('authToken');
+    const response = await api.post(endpoint, data, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -41,8 +61,80 @@ export const createUser = async (userData) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error creating user:", error.response?.data || error.message);
+    console.error('API GET Error:', error);
+    const status = error?.response?.status;
+    console.log("Error status: ", status)
+    console.log("Error message: ", error?.response)
+    if (status === 401 || status === 403) {
+      handleUnauthorized();
+    }
     // throw error;
+  }
+};
+
+export const createServer = async (serverData) => {
+  try {
+    console.log("Server data: ", serverData);
+    const token = localStorage.getItem('authToken');
+    const response = await api.post("/server", serverData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('API GET Error:', error);
+    const status = error?.response?.status;
+    console.log("Error status: ", status)
+    console.log("Error message: ", error?.response)
+    if (status === 401 || status === 403) {
+      handleUnauthorized();
+    }
+    // throw error;
+  }
+};
+
+export const updateUser = async (userId, userData) => {
+  try {
+    const token = localStorage.getItem('authToken');
+    const response = await api.put(`/user/${userId}`, userData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('API GET Error:', error);
+    const status = error?.response?.status;
+    console.log("Error status: ", status)
+    console.log("Error message: ", error?.response)
+    if (status === 401 || status === 403) {
+      handleUnauthorized();
+    }
+    // throw error;
+  }
+};
+
+export const updateServer = async (userId, userData) => {
+  try {
+    const token = localStorage.getItem('authToken');
+    const response = await api.put(`/server/${userId}`, userData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('API GET Error:', error);
+    const status = error?.response?.status;
+    console.log("Error status: ", status)
+    console.log("Error message: ", error?.response)
+    if (status === 401 || status === 403) {
+      handleUnauthorized();
+    }
   }
 };
 
@@ -56,8 +148,35 @@ export const deleteUser = async (userId) => {
     });
     return response.data;
   } catch (error) {
-    console.error('Error deleting user:', error.response?.data || error.message);
-    throw error;
+    console.error('API GET Error:', error);
+    const status = error?.response?.status;
+    console.log("Error status: ", status)
+    console.log("Error message: ", error?.response)
+    if (status === 401 || status === 403) {
+      handleUnauthorized();
+    }
+    // throw error;
+  }
+};
+
+export const deleteServer = async (serverId) => {
+  try {
+    const token = localStorage.getItem('authToken');
+    const response = await api.delete(`/server/${serverId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('API GET Error:', error);
+    const status = error?.response?.status;
+    console.log("Error status: ", status)
+    console.log("Error message: ", error?.response)
+    if (status === 401 || status === 403) {
+      handleUnauthorized();
+    }
+    // throw error;
   }
 };
 
@@ -67,22 +186,53 @@ export const getVpnData = async (endpoint, path) => {
     return response;
   } catch (error) {
     console.error('API GET Error:', error);
-    throw error;
+    const status = error?.response?.status;
+    console.log("Error status: ", status)
+    console.log("Error message: ", error?.response)
+    if (status === 401 || status === 403) {
+      handleUnauthorized();
+    }
+    // throw error;
   }
 };
 
-// Example: Post data
-export const postData = async (endpoint, payload) => {
+export const startServer = async (serverId) => {
   try {
-    const response = await api.post(endpoint, payload);
+    const token = localStorage.getItem('authToken');
+    const response = await api.post(`/server/${serverId}/start`, {}, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
   } catch (error) {
-    // console.error('API POST Error:', error);
-    const message = error?.response?.data?.detail;
-    console.log("Error message: ", message)
-    return error;
+    console.error('API GET Error:', error);
+    const status = error?.response?.status;
+    console.log("Error status: ", status)
+    console.log("Error message: ", error?.response)
+    if (status === 401 || status === 403) {
+      handleUnauthorized();
+    }
+    // throw error;
   }
-};
+}
+
+// // Example: Post data
+// export const postData = async (endpoint, payload) => {
+//   try {
+//     const response = await api.post(endpoint, payload);
+//     return response.data;
+//   } catch (error) {
+//     // console.error('API POST Error:', error);
+//     console.error('API GET Error:', error);
+//     const status = error?.response?.status;
+//     console.log("Error status: ", status)
+//     console.log("Error message: ", error?.response)
+//     if (status === 401 || status === 403) {
+//       handleUnauthorized();
+//     }
+//   }
+// };
 
 // Login API
 export const login = async (creds) => {
@@ -103,6 +253,13 @@ export const login = async (creds) => {
       return response
     } catch (err) {
         console.log(err.response?.data?.detail || 'An error occurred. Please try again.');
+        console.error('API GET Error:', err);
+        const status = err?.response?.status;
+        console.log("Error status: ", status)
+        console.log("Error message: ", err?.response)
+        if (status === 401 || status === 403) {
+          handleUnauthorized();
+        }
     } finally {
     }
   };

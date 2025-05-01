@@ -4,6 +4,7 @@ from core.config import settings
 from db.session import SessionLocal
 from db.init_db import init_db
 from api.api import api_router
+from api.socket_server import socket_app
 
 
 app = FastAPI(
@@ -23,6 +24,7 @@ if settings.BACKEND_CORS_ORIGINS:
 db = SessionLocal()
 init_db(db)
 
+app.mount("/socket.io", socket_app)
 app.include_router(api_router)
 
 if __name__ == "__main__":

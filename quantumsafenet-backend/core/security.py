@@ -29,3 +29,19 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def get_password_hash(password: str) -> str:
     return pwd_context.hash(password)
+
+import subprocess
+
+
+def get_pub_private_key_pair():
+    """
+    Generate a public/private key pair for WireGuard.
+    :return: Tuple of (private_key, public_key).
+    """
+    private_key = subprocess.check_output(
+        ["wg", "genkey"], text=True
+    ).strip()
+    public_key = subprocess.check_output(
+        ["wg", "pubkey"], input=private_key, text=True
+    ).strip()
+    return private_key, public_key

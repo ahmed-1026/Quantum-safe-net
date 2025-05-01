@@ -1,7 +1,8 @@
 /Fyp Plane.docx
 
 ./quantumsafenet-frontend/node_modules
-quantumsafenet-backend/venv
+quantumsafenet-backend/quantumsafenet.db
+venv
 *.pyc
 
 Resouces/
@@ -13,3 +14,6 @@ IDPS/.huggingface
 IDPS/venv
 
 Chat-bot/config.json
+
+ServerUtility/build
+ServerUtility/dist

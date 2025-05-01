@@ -1,0 +1,7 @@
+pika
+psutil
+pyinstaller
+python-socketio
+requests
+packaging
+aiohttp

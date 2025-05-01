@@ -1,10 +1,26 @@
 // src/components/Dashboard.jsx
-import React from 'react';
+import React, {useState, useEffect} from 'react';
+import { getData } from '../../apiService';
 
 
 const Dashboard = () => {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+      const fetchUsers = async () => {
+        try {
+          const response = await getData('/account/me');
+          console.log("email: ", response?.data?.email);
+          setUser(response?.data);
+        } catch (error) {
+          console.error('Error fetching users:', error);
+        }
+      };
+  
+      fetchUsers();
+    }, []);
   return <div>
-    Welcome to the Dashboard!
+    Welcome <strong>{user?.full_name}</strong> to the Dashboard!
     {/* Online Users Count */}
     {/* <div className="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
       <div className="flex items-center space-x-2">

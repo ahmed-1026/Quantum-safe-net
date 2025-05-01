@@ -1,0 +1,13 @@
+[Unit]
+Description=QuantumSafeNet Backend Management
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/root/Quantum-safe-net/venv/bin/python3 /root/Quantum-safe-net/Chat-bot/main.py
+WorkingDirectory=/root/Quantum-safe-net
+Restart=on-failure
+User=root
+
+[Install]
+WantedBy=multi-user.target

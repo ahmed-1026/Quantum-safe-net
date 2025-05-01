@@ -28,9 +28,11 @@ const LoginPage = ({ onLogin }) => {
       if (response?.data?.access_token) {
         // Store token in localStorage or context for future requests
         localStorage.setItem('authToken', response?.data?.access_token);
+        localStorage.setItem('userRole', response?.data?.role);
+        console.log("userRole", response?.data?.role);
 
         // Navigate to the dashboard
-        onLogin();
+        onLogin(response?.data?.role);
         navigate('/dashboard');
       } else {
         // Handle unexpected API response

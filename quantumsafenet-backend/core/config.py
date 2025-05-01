@@ -19,11 +19,13 @@ class Settings(BaseModel):
 
     PROJECT_NAME: str = 'QuantumSafeNet'
     # SQLALCHEMY_DATABASE_URI: Optional[MySQLDsn] = "mysql+pymysql://ahmed:528082@localhost:3306/quantumsafenet"
-    SQLALCHEMY_DATABASE_URI: Optional[MySQLDsn] = "mysql+pymysql://appuser:strongpassword@localhost:3306/quantumsafenet"
+    # SQLALCHEMY_DATABASE_URI: Optional[MySQLDsn] = "mysql+pymysql://appuser:strongpassword@localhost:3306/quantumsafenet"
+    SQLALCHEMY_DATABASE_URI: Optional[MySQLDsn] = "sqlite:///./quantumsafenet.db"
 
     FIRST_SUPERUSER: EmailStr = "admin@qsn.com"
     FIRST_SUPERUSER_PASSWORD: str = '123'
 
+    WIREGUARD_MANAGER_PORT: int = 8002
     WIREGUARD_MANAGER_URL: str = f'http://{HOST_IP}:8002'
 
     class Config:

@@ -6,10 +6,12 @@ import {
   Navigate,
 } from "react-router-dom";
 import Dashboard from "./pages/Dashboard/dashboard";
+import EmployeeDashboard from "./components/Employee/EmployeeDashboard";
 import { Sidebar } from "./components/Sidebar/Sidebar";
 import { SidebarToggle } from "./components/Sidebar/SidebarToggle";
 import LoginPage from "./pages/Login/login";
 import UserTable from "./components/User/UserTable";
+import ServerTable from "./components/Server/ServerTable";
 import AssetTable from './components/Asset/AssetTable';
 import Chatbot from "./components/Chatbot/chatbot";
 
@@ -26,6 +28,9 @@ function QuantumSafeNet() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return localStorage.getItem("isAuthenticated") === "true";
   });
+  const [userRole, setUserRole] = useState(() => {
+    return localStorage.getItem("userRole");
+  });
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Check token validity on page load
@@ -36,6 +41,8 @@ function QuantumSafeNet() {
     if (token && tokenExpiry) {
       if (Date.now() < parseInt(tokenExpiry)) {
         setIsAuthenticated(true);
+        setUserRole(localStorage.getItem("userRole"));
+        console.log("User role:", userRole);
       } else {
         // Token expired
         handleLogout();
@@ -48,10 +55,13 @@ function QuantumSafeNet() {
   }, [isAuthenticated]);
 
   // When logging in
-  const handleLogin = () => {
+  const handleLogin = (role) => {
     const expiryTime = Date.now() + (24 * 60 * 60 * 1000); // 24 hours
     localStorage.setItem('tokenExpiry', expiryTime);
+    localStorage.setItem("isAuthenticated", true);
+    localStorage.setItem("userRole", role);
     setIsAuthenticated(true);
+    setUserRole(role);
   };
 
   // const handleLogin = () => {
@@ -61,6 +71,9 @@ function QuantumSafeNet() {
   const handleLogout = () => {
     setIsAuthenticated(false);
     localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("tokenExpiry");
+    localStorage.removeItem("userRole");
     // You might want to redirect to login page here
   };
 
@@ -85,7 +98,10 @@ function QuantumSafeNet() {
         />
       )}
 
-      <Sidebar isOpen={isSidebarOpen} />
+      {userRole === "admin" ? (
+        <Sidebar isOpen={isSidebarOpen} />
+      ) : (null)}
+          
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
@@ -107,10 +123,19 @@ function QuantumSafeNet() {
           <div className="p-6">
             <Routes>
               <Route path="/" element={<Navigate to="/dashboard" />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/users" element={<UserTable />} />{" "}
-              <Route path="/assets" element={<AssetTable />} />
-              {/* Add other routes here */}
+              {userRole === "admin" ? (
+                <>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/users" element={<UserTable />} />
+                  <Route path="/assets" element={<AssetTable />} />
+                  <Route path="/servers" element={<ServerTable />} />
+                </>
+              ) : (
+                <>
+                  <Route path="/dashboard" element={<EmployeeDashboard />} />
+                </>
+              )}
+              {/* Add other routes */}
             </Routes>
           </div>
         </main>

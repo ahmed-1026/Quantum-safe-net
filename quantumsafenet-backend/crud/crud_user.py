@@ -1,6 +1,7 @@
 from typing import Any, Dict, Optional, Union
 import requests
 from sqlalchemy.orm import Session
+import datetime
 
 from core.security import get_password_hash, verify_password
 from core.config import settings
@@ -14,29 +15,15 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         return db.query(User).filter(User.email == email).first()
 
     def create(self, db: Session, *, obj_in: UserCreate) -> User:
-        wg_manager_url = settings.WIREGUARD_MANAGER_URL
-        response = requests.post(
-            f"{wg_manager_url}/vpn/users",
-            params={
-            "client_name": obj_in.full_name,
-            "wg_config_path": "/etc/wireguard/wg0.conf",
-            "server_pub_ip": "192.168.1.1",
-            "server_port": 51820,
-            "dns": ["1.1.1.1", "1.0.0.1"]
-            },
-            headers={"accept": "application/json"},
-            data={}
-        )
-        if response.status_code != 200:
-            raise Exception(f"Failed to create VPN user: {response.text}")
-        else:
-            config_path = response.json()["message"].split(": ")[1]
+        
         db_obj = User(
             email=obj_in.email,
             password=get_password_hash(obj_in.password),
             full_name=obj_in.full_name,
             role=obj_in.role,
-            vpnconfig=config_path
+            
+            created_at=datetime.datetime.now(datetime.timezone.utc),
+            updated_at=datetime.datetime.now(datetime.timezone.utc),
         )
         db.add(db_obj)
         db.commit()
@@ -49,11 +36,11 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         if isinstance(obj_in, dict):
             update_data = obj_in
         else:
-            update_data = obj_in.dict(exclude_unset=True)
-        if update_data["password"]:
-            hashed_password = get_password_hash(update_data["password"])
-            del update_data["password"]
-            update_data["password"] = hashed_password
+            update_data = obj_in.model_dump(exclude_unset=True)
+        # if update_data["password"]:
+        #     hashed_password = get_password_hash(update_data["password"])
+        #     del update_data["password"]
+        #     update_data["password"] = hashed_password
         return super().update(db, db_obj=db_obj, obj_in=update_data)
 
     def authenticate(self, db: Session, *, email: str, password: str) -> Optional[User]:
@@ -66,22 +53,6 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
 
     def is_active(self, user: User) -> bool:
         return user.is_active
-    
-    def remove(self, db, *, id):
-        user = self.get(db, id=id)
-        wg_manager_url = settings.WIREGUARD_MANAGER_URL
-        response = requests.delete(
-            f"{wg_manager_url}/vpn/users",
-            params={
-            "client_name": user.full_name,
-            "wg_config_path": user.vpnconfig
-            },
-            headers={"accept": "application/json"},
-            data={}
-        )
-        if response.status_code != 200:
-            raise Exception(f"Failed to delete user: {response.text}")
-        return super().remove(db, id=id)
 
 
 

@@ -26,7 +26,7 @@ const menuItems = [
     text: "Subscriptions",
     path: "/subscriptions",
   },
-  { icon: <Server size={18} />, text: "VPN Servers", path: "/vpn-servers" },
+  { icon: <Server size={18} />, text: "VPN Servers", path: "/servers" },
   { icon: <Settings size={18} />, text: "Settings", path: "/settings" },
   { icon: <Bell size={18} />, text: "Notifications", path: "/notifications" },
   { icon: <Link size={18} />, text: "App Links", path: "/app-links" },

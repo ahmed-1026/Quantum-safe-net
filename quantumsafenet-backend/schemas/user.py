@@ -1,4 +1,5 @@
 from typing import Optional
+from datetime import datetime
 
 from pydantic import BaseModel, EmailStr
 
@@ -19,18 +20,19 @@ class UserCreate(UserBase):
 # Properties to receive via API on update
 class UserUpdate(UserBase):
     location: Optional[str] = None
-    vpnconfig: Optional[str] = None
     trustscore: Optional[int] = 0
     assets: Optional[str] = None
-    password: Optional[str] = None
+    # password: Optional[str] = None
 
 
 class UserInDBBase(UserBase):
     id: int
     location: Optional[str] = None
-    vpnconfig: Optional[str] = None
     trustscore: Optional[int] = 0
     assets: Optional[str] = None
+    
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True

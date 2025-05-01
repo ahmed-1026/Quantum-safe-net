@@ -40,7 +40,7 @@ const Chatbot = () => {
     const generateResponse = async (userMessage) => {
         try {
             const response = await fetch(
-                `http://localhost:8001/?message=${encodeURIComponent(userMessage)}`,
+                `http://134.122.115.78:8001/?message=${encodeURIComponent(userMessage)}`,
                 {
                     method: 'GET',
                     headers: {

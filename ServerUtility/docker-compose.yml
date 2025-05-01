@@ -1,0 +1,91 @@
+version: "3.9"
+
+services:
+#  ubuntu_18:
+#    image: ubuntu:18.04
+#    volumes:
+#      - ./:/app
+#      - ./output:/output
+#    working_dir: /app
+#    command: >
+#      bash -c "apt-get update &&
+#      apt-get install -y python3 python3-pip python3-venv build-essential zip &&
+#      python3 -m venv venv &&
+#      . venv/bin/activate &&
+#      pip install --upgrade pip &&
+#      pip install -r requirements.txt &&
+#      pyinstaller --onefile --clean --name main --paths=./services --paths=./models monitor.py &&
+#      cp dist/main /output/main-ubuntu-18.04"
+
+  ubuntu_20:
+    image: ubuntu:20.04
+    volumes:
+      - ./:/app
+      - ./output:/output
+    working_dir: /app
+    command: >
+      bash -c "apt-get update &&
+      apt-get install -y python3 python3-pip python3-venv build-essential zip &&
+      python3 -m venv venv &&
+      . venv/bin/activate &&
+      pip install --upgrade pip &&
+      pip install -r requirements.txt &&
+      pyinstaller --onefile --name monitor \
+        --hidden-import=pika \
+        --hidden-import=psutil \
+        --hidden-import=socketio \
+        --hidden-import=requests \
+        --hidden-import=packaging \
+        --hidden-import=aiohttp \
+        --paths=./models --paths=./services \
+        monitor.py &&
+      cp dist/monitor /output/monitor-20.04 && chmod 777 /output/monitor-20.04"
+
+  ubuntu_22:
+    image: ubuntu:22.04
+    volumes:
+      - ./:/app
+      - ./output:/output
+    working_dir: /app
+    command: >
+      bash -c "apt-get update &&
+      apt-get install -y python3 python3-pip python3-venv build-essential zip &&
+      python3 -m venv venv &&
+      . venv/bin/activate &&
+      pip install --upgrade pip &&
+      pip install -r requirements.txt &&
+      pyinstaller --onefile --name monitor \
+        --hidden-import=pika \
+        --hidden-import=psutil \
+        --hidden-import=socketio \
+        --hidden-import=requests \
+        --hidden-import=packaging \
+        --hidden-import=aiohttp \
+        --paths=./models --paths=./services \
+        monitor.py &&
+      cp dist/monitor /output/monitor-22.04 && chmod 777 /output/monitor-22.04"
+
+  
+  ubuntu_24:
+    image: ubuntu:24.04
+    volumes:
+      - ./:/app
+      - ./output:/output
+    working_dir: /app
+    command: >
+      bash -c "apt-get update &&
+      apt-get install -y python3 python3-pip python3-venv build-essential zip &&
+      python3 -m venv venv &&
+      . venv/bin/activate &&
+      pip install --upgrade pip &&
+      pip install -r requirements.txt &&
+      pyinstaller --onefile --name monitor \
+        --hidden-import=pika \
+        --hidden-import=psutil \
+        --hidden-import=socketio \
+        --hidden-import=requests \
+        --hidden-import=packaging \
+        --hidden-import=aiohttp \
+        --paths=./models --paths=./services \
+        monitor.py &&
+      cp dist/monitor /output/monitor-24.04 && chmod 777 /output/monitor-24.04 && echo $$\(/output/monitor-20.04 --version\)"

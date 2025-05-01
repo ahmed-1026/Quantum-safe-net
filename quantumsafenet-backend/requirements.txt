@@ -9,3 +9,5 @@ psycopg2-binary
 pymysql
 python-multipart
 requests
+python-socketio
+fastapi-socketio

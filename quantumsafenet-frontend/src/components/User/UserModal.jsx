@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { createUser } from "../../apiService";
+import { createUser, updateUser } from "../../apiService";
 
-const UserModal = ({ user, onClose, onSubmit }) => {
+const UserModal = ({ userId, user, onClose, onSubmit }) => {
   const [formData, setFormData] = useState({
-    // id: "",
     role: "admin",
     full_name: "",
     email: "",
@@ -24,8 +23,14 @@ const UserModal = ({ user, onClose, onSubmit }) => {
 
   const handleSubmit = async (u) => {
     u.preventDefault();
-    const createdUser = await createUser(formData);
-    onSubmit(createdUser);
+    var responseUser = null;
+    if (userId) {
+      responseUser = await updateUser(userId, formData);
+    }
+    else {
+      responseUser = await createUser(formData);
+    }
+    onSubmit(responseUser);
   };
   // console.log("Current formData:", formData);
   return (
@@ -89,6 +94,25 @@ const UserModal = ({ user, onClose, onSubmit }) => {
               required
             />
           </div>
+          {!userId && (
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                required
+              />
+            </div>
+          )}
           <div>
             <label
               htmlFor="is_active"

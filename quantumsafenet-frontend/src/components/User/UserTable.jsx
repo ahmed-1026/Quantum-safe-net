@@ -62,12 +62,9 @@ const UserTable = () => {
 
   const handleSubmit = (user) => {
     console.log("User submitted: ", user);
-    if (user.id) {
-      // Update existing asset
+    if (currentUser) {
       setUsers(users.map((u) => (u.id === user.id ? user : u)));
     } else {
-      // Add new asset
-      user.id = Date.now().toString();
       setUsers([...users, user]);
     }
     setIsModalOpen(false);
@@ -138,6 +135,7 @@ const UserTable = () => {
       )}
       {isModalOpen && (
         <UserModal
+          userId={currentUser ? currentUser.id : null}
           user={currentUser}
           onClose={() => setIsModalOpen(false)}
           onSubmit={handleSubmit}

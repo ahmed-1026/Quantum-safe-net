@@ -1,4 +1,6 @@
 from .crud_user import user
+from .server import server
+from .wg_key import wgkey
 
 # For a new basic set of CRUD operations you could just do
 
