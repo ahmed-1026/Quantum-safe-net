@@ -25,7 +25,7 @@ const EmployeeDashboard = () => {
         try {
           const response = await getData('/server');
           console.log("Data: ", response?.data);
-          setServers(response?.data);
+          setServers(Array.isArray(response?.data) ? response.data : []);
         } catch (error) {
           console.error('Error fetching servers:', error);
         }
