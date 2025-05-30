@@ -98,10 +98,7 @@ function QuantumSafeNet() {
         />
       )}
 
-      {userRole === "admin" ? (
-        <Sidebar isOpen={isSidebarOpen} />
-      ) : (null)}
-          
+      <Sidebar isOpen={isSidebarOpen} userRole={userRole} />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden">

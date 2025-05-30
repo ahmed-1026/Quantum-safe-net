@@ -35,8 +35,15 @@ const menuItems = [
   { icon: <List size={18} />, text: "System Logs", path: "/system-logs" },
 ];
 
-export const Sidebar = ({ isOpen }) => (
-  <aside
+export const Sidebar = ({ isOpen, userRole }) => {
+  const allowedItemsForEmployee = ["Dashboard", "Knowledgebase", "Support"];
+
+  const filteredMenu = userRole === "admin"
+    ? menuItems
+    : menuItems.filter(item => allowedItemsForEmployee.includes(item.text));
+
+  return (
+    <aside
     className={`
     fixed lg:sticky top-0 left-0 z-30 w-64 bg-white border-r border-gray-200 
     h-screen overflow-y-auto flex flex-col
@@ -66,7 +73,7 @@ export const Sidebar = ({ isOpen }) => (
       </div>
 
       <nav className="space-y-1">
-        {menuItems.map((item, index) => (
+        {filteredMenu.map((item, index) => (
           <NavLink
             key={index}
             to={item.path}
@@ -83,4 +90,5 @@ export const Sidebar = ({ isOpen }) => (
       </nav>
     </div>
   </aside>
-);
+  );
+};
