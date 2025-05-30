@@ -74,8 +74,24 @@ function QuantumSafeNet() {
     localStorage.removeItem("authToken");
     localStorage.removeItem("tokenExpiry");
     localStorage.removeItem("userRole");
-    // You might want to redirect to login page here
+    
+    // Clear browser history and redirect to login
+    window.history.pushState(null, null, '/login');
+    window.history.replaceState(null, null, '/login');
+    
+    // Prevent back navigation
+    window.addEventListener('popstate', preventBack);
   };
+  const preventBack = () => {
+    window.history.pushState(null, null, '/login');
+  };
+  
+  // Add this useEffect to clean up the event listener
+  useEffect(() => {
+    return () => {
+      window.removeEventListener('popstate', preventBack);
+    };
+  }, []);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
@@ -83,6 +99,7 @@ function QuantumSafeNet() {
   if (!isAuthenticated) {
     return (
       <Routes>
+        <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
         <Route path="*" element={<LoginPage onLogin={handleLogin} />} />
       </Routes>
     );
@@ -98,7 +115,7 @@ function QuantumSafeNet() {
         />
       )}
 
-      <Sidebar isOpen={isSidebarOpen} userRole={userRole} />
+      <Sidebar isOpen={isSidebarOpen} userRole={userRole} handleLogout = {handleLogout}/>
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden">

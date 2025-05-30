@@ -12,7 +12,8 @@ import {
   Book,
   MessageSquare,
   List,
-  Database
+  Database,
+  LogOut
 } from "lucide-react";
 
 const menuItems = [
@@ -35,7 +36,7 @@ const menuItems = [
   { icon: <List size={18} />, text: "System Logs", path: "/system-logs" },
 ];
 
-export const Sidebar = ({ isOpen, userRole }) => {
+export const Sidebar = ({ isOpen, userRole, handleLogout }) => {
   const allowedItemsForEmployee = ["Dashboard", "Knowledgebase", "Support"];
 
   const filteredMenu = userRole === "admin"
@@ -88,6 +89,16 @@ export const Sidebar = ({ isOpen, userRole }) => {
           </NavLink>
         ))}
       </nav>
+    </div>
+    {/* Logout Section */}
+    <div className="flex-shrink-0 p-4 border-t border-gray-200">
+      <button
+        onClick={handleLogout}
+        className="flex items-center space-x-2 px-4 py-2 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 text-sm w-full transition-colors duration-200"
+      >
+        <LogOut size={18} />
+        <span>Logout</span>
+      </button>
     </div>
   </aside>
   );
