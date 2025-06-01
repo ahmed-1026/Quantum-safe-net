@@ -99,29 +99,30 @@ def read_wg_config(
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to get wg configuration: {str(e)}")
 
-@router.put("/{server_id}", response_model=schemas.ServerInDB)
-def update_user(
-    server_id: int,
-    server_in: schemas.ServerUpdate,
+@router.put("/{wgkey_id}", response_model=schemas.WGKeyInDB)
+def update_wgkey(
+    wgkey_id: int,
+    wgkey_in: schemas.WGKeyUpdate,
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(deps.get_current_user),
 ) -> Any:
     """
-    Update user
+    Update wg key
     """
     role = current_user.role
-    if role != 'admin':
-        raise HTTPException(status_code=400, detail="You are not authorized to edit servers")
+    wgkey = crud.wgkey.get(db, id=wgkey_id)
+    if wgkey is None:
+        raise HTTPException(status_code=404, detail="Key not found")
     
-    server = crud.server.get(db, id=server_id)
-    if server is None:
-        raise HTTPException(status_code=404, detail="Server not found")
-    server = crud.server.update(db, db_obj=server, obj_in=server_in)
-    return server
+    if wgkey.user_id != current_user.id:
+        raise HTTPException(status_code=400, detail="You are not authorized to update this wgkey")
+    
+    wgkey = crud.wgkey.update(db, db_obj=wgkey, obj_in=wgkey_in)
+    return wgkey
 
-@router.delete("/{server_id}", response_model=schemas.ServerInDB)
+@router.delete("/{wgkey_id}", response_model=schemas.WGKeyInDB)
 def delete_user(
-    server_id: int,
+    wgkey_id: int,
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(deps.get_current_user),
 ) -> Any:
@@ -129,12 +130,12 @@ def delete_user(
     Delete user
     """
     role = current_user.role
-    if role != 'admin':
-        raise HTTPException(status_code=400, detail="You are not authorized to delete servers")
+    wgkey = crud.wgkey.get(db, id=wgkey_id)
+    if wgkey.user_id != current_user.id:
+        raise HTTPException(status_code=400, detail="You are not authorized to delete this wgkey")
     
-    server = crud.server.get(db, id=server_id)
-    if server is None:
-        raise HTTPException(status_code=404, detail="User not found")
+    if wgkey is None:
+        raise HTTPException(status_code=404, detail="Key not found")
     
-    server = crud.server.remove(db, id=server_id)
-    return server
+    wgkey = crud.wgkey.remove(db, id=wgkey_id)
+    return wgkey
