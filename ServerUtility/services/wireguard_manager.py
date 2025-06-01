@@ -117,9 +117,9 @@ def wire_guard_setup(
         with open("/etc/wireguard/wg0.conf", "w") as f:
             f.write(textwrap.dedent(f"""\
                 [Interface]
-                Address = {wg_ip_v4}
+                Address = {wg_ip_v4}/24
                 ListenPort = {SERVER_PORT}
-                PrivateKey = {SERVER_PRIV_KEY}x
+                PrivateKey = {SERVER_PRIV_KEY}
 
                 PostUp = iptables -I INPUT -p udp --dport {SERVER_PORT} -j ACCEPT
                 PostUp = iptables -I FORWARD -i {SERVER_PUB_NIC} -o {SERVER_WG_NIC} -j ACCEPT
@@ -157,6 +157,24 @@ def wire_guard_setup(
     except subprocess.CalledProcessError as e:
         return False
 
+def add_peer_to_conf(public_key: str, allowed_ips: str = "10.0.0.2/32, 0.0.0.0/0, ::/0", keepalive: int = 25):
+    peer_config = textwrap.dedent(f"""\
+    
+    [Peer]
+    PublicKey = {public_key}
+    AllowedIPs = {allowed_ips}
+    PersistentKeepalive = {keepalive}
+    """)
+    
+    try:
+        with open("/etc/wireguard/wg0.conf", "a") as conf_file:
+            conf_file.write(peer_config)
+        print("Peer added to wg0.conf successfully.")
+        return True
+    except Exception as e:
+        print(f"Failed to write to wg0.conf: {e}")
+        return False
+
 def new_client(client_pub_key: str, client_ip):
     """
     Create a new WireGuard client.
@@ -169,9 +187,12 @@ def new_client(client_pub_key: str, client_ip):
         subprocess.run(["wg", "set", "wg0",
             "peer", client_pub_key,
             # "preshared-key", "/dev/stdin",
-            "allowed-ips", client_ip],
+            "allowed-ips", client_ip + "/32",
+            "persistent-keepalive", "25"],
             # input=client_pre_shared_key, 
             text=True, check=True)
+        
+        add_peer_to_conf(client_pub_key, client_ip + "/32", keepalive=25)
 
         return True
     except subprocess.CalledProcessError as e:

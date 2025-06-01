@@ -47,6 +47,7 @@ const EmployeeDashboard = () => {
     try {
       const response = await getData(`/wgkey/${server_id}/config`);
       console.log("Data: ", response?.data);
+      console.log("Config: ", response?.data.configuration);
       setConfig(response?.data.configuration);
       setConfigId(response?.data.id);
       setIsImageModalOpen(true);

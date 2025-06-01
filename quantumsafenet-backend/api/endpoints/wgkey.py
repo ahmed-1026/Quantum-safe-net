@@ -89,11 +89,12 @@ def read_wg_config(
             [Interface]
             PrivateKey = {wgkey.private_key}
             Address = {wgkey.address}
+            
 
             [Peer]
             PublicKey = {server.server_public_key}
             Endpoint = {server.server_ip}:{server.server_port}
-            AllowedIPs = 0.0.0/0, ::/0
+            AllowedIPs = 0.0.0.0/0, ::/0
             """)
         return JSONResponse(content={"id": wgkey.id,"configuration": configuration})
     except Exception as e:
