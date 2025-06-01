@@ -45,7 +45,7 @@ class Socket:
     
     async def add_wireguard_client(self, data):
         logger.info(f'Adding WireGuard client...{data}')
-        if not wireguard_manager.new_client(data.get("client_public_key"), data.get("client_ip")):
+        if not wireguard_manager.new_client(data.get("client_public_key"), data.get("client_pre_shared_key"), data.get("client_ip")):
             logger.error("Failed to add WireGuard client. Please check the logs for more details.")
             return
         await self.sio.emit("wg-response", {

@@ -157,11 +157,12 @@ def wire_guard_setup(
     except subprocess.CalledProcessError as e:
         return False
 
-def add_peer_to_conf(public_key: str, allowed_ips: str = "10.0.0.2/32, 0.0.0.0/0, ::/0", keepalive: int = 25):
+def add_peer_to_conf(public_key: str, preshared_key, allowed_ips: str = "10.0.0.2/32, 0.0.0.0/0, ::/0", keepalive: int = 25):
     peer_config = textwrap.dedent(f"""\
     
     [Peer]
     PublicKey = {public_key}
+    PresharedKey = {preshared_key}
     AllowedIPs = {allowed_ips}
     PersistentKeepalive = {keepalive}
     """)
@@ -175,24 +176,23 @@ def add_peer_to_conf(public_key: str, allowed_ips: str = "10.0.0.2/32, 0.0.0.0/0
         print(f"Failed to write to wg0.conf: {e}")
         return False
 
-def new_client(client_pub_key: str, client_ip):
+def new_client(client_pub_key: str, client_pre_shared_key, client_ip):
     """
     Create a new WireGuard client.
-    :param client_name: Name of the new client.
-    :param server_pub_ip: Public IP of the WireGuard server.
-    :param server_port: Port on which WireGuard server listens.
+    :param client_pub_key: Public key of the WireGuard client.
+    :param client_pre_shared_key: Pre-shared key for the WireGuard client.
     :param client_ip: IP address assigned to the client.
     """
     try:
         subprocess.run(["wg", "set", "wg0",
             "peer", client_pub_key,
-            # "preshared-key", "/dev/stdin",
+            "preshared-key", "/dev/stdin",
             "allowed-ips", client_ip + "/32",
             "persistent-keepalive", "25"],
-            # input=client_pre_shared_key, 
+            input=client_pre_shared_key, 
             text=True, check=True)
         
-        add_peer_to_conf(client_pub_key, client_ip + "/32", keepalive=25)
+        add_peer_to_conf(client_pub_key, client_pre_shared_key, client_ip + "/32", keepalive=25)
 
         return True
     except subprocess.CalledProcessError as e:

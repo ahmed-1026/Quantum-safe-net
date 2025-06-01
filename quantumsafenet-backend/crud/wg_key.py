@@ -6,7 +6,7 @@ from .base import CRUDBase
 from models import WGKey, Server
 from schemas import WGKeyCreate, WGKeyUpdate
 from core.config import settings
-from core.security import get_pub_private_key_pair
+from core.security import get_pub_private_key_pair, generate_kyber_psk
 from api.socket_server import send_message
 
 
@@ -32,9 +32,11 @@ class CRUDWGKey(CRUDBase[WGKey, WGKeyCreate, WGKeyUpdate]):
         if wgkey:
             client_private_key = wgkey.private_key
             client_public_key = wgkey.public_key
+            client_preshared_key = wgkey.pre_shared_key
         else:
             # Generate private and public keys
             client_private_key, client_public_key = get_pub_private_key_pair()
+            client_preshared_key = generate_kyber_psk()
         last_used_ip = server.last_used_ip
         # Find an available IPv4 address
         client_ip = last_used_ip.split(".")
@@ -44,6 +46,7 @@ class CRUDWGKey(CRUDBase[WGKey, WGKeyCreate, WGKeyUpdate]):
         # add to wireguard server
         await send_message(server.server_ip, "add-client", {
             "client_public_key": client_public_key,
+            "client_pre_shared_key": client_preshared_key,
             "client_ip": client_ip
         })
         db_obj = WGKey(
@@ -51,7 +54,7 @@ class CRUDWGKey(CRUDBase[WGKey, WGKeyCreate, WGKeyUpdate]):
             server_id=obj_in.server_id,
             public_key=client_public_key,
             private_key=client_private_key,
-            pre_shared_key="pre-shared key placeholder"+client_ip,
+            pre_shared_key=client_preshared_key,
             address=client_ip,
             is_active=True,
         )

@@ -3,6 +3,9 @@ from typing import Any, Union
 
 from jose import jwt
 from passlib.context import CryptContext
+import oqs
+import hashlib
+import base64
 
 from .config import settings
 
@@ -45,3 +48,20 @@ def get_pub_private_key_pair():
         ["wg", "pubkey"], input=private_key, text=True
     ).strip()
     return private_key, public_key
+
+def generate_kyber_psk():
+    alg = 'Kyber512'
+
+    with oqs.KeyEncapsulation(alg) as server_kem:
+        public_key = server_kem.generate_keypair()
+
+        with oqs.KeyEncapsulation(alg) as client_kem:
+            ciphertext, shared_secret_client = client_kem.encap_secret(public_key)
+
+        shared_secret_server = server_kem.decap_secret(ciphertext)
+
+    assert shared_secret_client == shared_secret_server, "Key exchange failed!"
+
+    wireguard_psk = hashlib.blake2s(shared_secret_client).digest()
+
+    return base64.b64encode(wireguard_psk).decode('utf-8')

@@ -93,6 +93,7 @@ def read_wg_config(
 
             [Peer]
             PublicKey = {server.server_public_key}
+            PresharedKey = {wgkey.pre_shared_key}
             Endpoint = {server.server_ip}:{server.server_port}
             AllowedIPs = 0.0.0.0/0, ::/0
             """)
