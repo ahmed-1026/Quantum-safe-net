@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { EyeIcon, EyeOffIcon, AlertCircle, CheckCircle, X, WifiOff } from 'lucide-react';
+import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import { login } from '../../apiService';
 import Alert from '../../components/Shared/alert'
 
