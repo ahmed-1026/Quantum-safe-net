@@ -78,7 +78,7 @@ async def start_server(
     if server is None:
         raise HTTPException(status_code=404, detail="Server not found")
     
-    await send_message(
+    resp = await send_message(
         server.server_ip,
         "initialize",
         {
@@ -87,6 +87,8 @@ async def start_server(
             "SERVER_PUB_KEY": server.server_public_key
         }
     )
+    if not resp:
+        raise HTTPException(status_code=500, detail="Failed to send start command to server")
     return server
 
 @router.put("/{server_id}", response_model=schemas.ServerInDB)

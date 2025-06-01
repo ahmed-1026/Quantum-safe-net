@@ -71,8 +71,9 @@ def main_app():
     )
     socket_thread.daemon = True
     socket_thread.start()
-    logger.info(f"Monitoring system and sending updates to RabbitMQ...")
-    monitor_and_send()
+    # logger.info(f"Monitoring system and sending updates to RabbitMQ...")
+    # monitor_and_send()
+    socket_thread.join()
 
 
 if __name__ == "__main__":

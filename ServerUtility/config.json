@@ -10,7 +10,7 @@
             "routing_key": "system_metrics"
         }
     },
-    "socket_server": "http://134.122.115.78",
+    "socket_server": "http://134.122.115.78:8000/socket.io",
     "server": {
         "ip": "134.122.115.78"
     },

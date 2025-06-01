@@ -1,7 +1,7 @@
 import os
 import socketio
 
-from services import MonitorApp, Updater
+from services import MonitorApp, Updater, start_wireguard
 from models.shared_logger import setup_logger
 
 
@@ -31,6 +31,14 @@ class Socket:
 
     async def start_wireguard(self, data):
         logger.info(f'Starting WireGuard...{data}')
+        if not start_wireguard.install_wireguard_script():
+            logger.error("Failed to install WireGuard. Please check the logs for more details.")
+            return
+        await self.sio.emit("wg-response", {
+            "status": "success",
+            "message": "WireGuard started successfully",
+            "serverIp": self.app.config.server.ip,
+        })
     
     async def add_wireguard_client(self, data):
         logger.info(f'Adding WireGuard client...{data}')

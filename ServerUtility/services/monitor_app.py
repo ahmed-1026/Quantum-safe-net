@@ -21,7 +21,7 @@ class MonitorApp:
     LAST_HANDSHAKE_TIME = 3 * 60
     def __init__(self, config: MonitorConfig, version: str) -> None:
         self.config = config
-        self.publisherChannel = self.get_publisher_channel()
+        # self.publisherChannel = self.get_publisher_channel()
         self.version = version
 
     @classmethod
@@ -59,55 +59,6 @@ class MonitorApp:
             return "active"
         except subprocess.CalledProcessError:
             return "inactive"
-
-    def get_shadowsocks_online_users(self, service: Service):
-        port = service.port
-        if service.type != Service.SHADOWSOCKS or port <= 0:
-            return 0
-        try:
-            # Run the ss command and get output
-            result = subprocess.run(
-               f"ss -ntu state established sport = :{port} | awk '{{print $5}}' | cut -d: -f1 | sort -u | wc -l",
-               capture_output=True, text=True, shell=True, check=True
-            )
-            return result.stdout.strip()
-        except subprocess.CalledProcessError as e:
-            print(f"Error executing command: {e}")
-            return 0
-
-    def get_openvpn_online_users(self, service: Service):
-        port = service.port
-        if service.type != Service.OPENVPN or port <= 0:
-            return 0
-        telnet_output = subprocess.check_output(
-            f"expect <<-EOF\n"
-            f"spawn telnet localhost {port}\n"
-            f"set timeout 5\n"
-            f"expect \"OpenVPN Management Interface\"\n"
-            f"send \"status 3\\r\"\n"
-            f"expect \"END\"\n"
-            f"send \"exit\\r\"\n"
-            f"EOF", shell=True, stderr=subprocess.DEVNULL
-        )
-        return len([line for line in telnet_output.decode().splitlines() if line.startswith("CLIENT_LIST")])
-
-    def get_openconnect_online_users(self, service: Service) -> int:
-        if service.type != Service.OPENCONNECT:
-            return 0
-        try:
-            # Execute the 'who -q' command and capture the output
-            result = subprocess.run(["sudo", "-S", "who", "-q"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
-            output = result.stdout.splitlines()
-            if output:
-                # The first line contains the user names, count words in it
-                user_count = len(output[0].split())
-                return user_count
-            else:
-                return 0
-        except subprocess.CalledProcessError as e:
-            print("Error executing 'who -q' command:", e)
-            return 0
-
 
     def get_wireguard_online_users(self, service: Service):
         if service.type != Service.WIREGUARD:
@@ -169,15 +120,8 @@ class MonitorApp:
         total_users = 0
         for service in self.config.services:
             try:
-                if service.type == Service.OPENVPN:
-                    total_users += self.get_openvpn_online_users(service)
-                elif service.type == Service.WIREGUARD:
+                if service.type == Service.WIREGUARD:
                     total_users += self.get_wireguard_online_users(service)
-                elif service.type == Service.SHADOWSOCKS:
-                    ssTotal = self.get_shadowsocks_online_users(service)
-                    total_users += int(ssTotal)
-                elif service.type == Service.OPENCONNECT:
-                    total_users += self.get_openconnect_online_users(service)
             except Exception as e:
                 print(f" [!] Error fetching users for service on port {service.port}: {e}")
         return total_users

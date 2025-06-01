@@ -12,7 +12,7 @@ class Settings(BaseModel):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 1
     SERVER_NAME: str = 'localhost'
     SERVER_HOST: AnyHttpUrl = 'http://127.0.0.1'
-    HOST_IP: str = '67.205.164.192'
+    HOST_IP: str = '134.122.115.78'
     # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = ["*","http://localhost:8000"]
     BASE_PATH: str = str(pathlib.Path().absolute()) + '/quantumsafenet-backend'

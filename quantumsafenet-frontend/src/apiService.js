@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  // baseURL: "http://134.122.115.78:8000/",
-  baseURL: "http://127.0.0.1:8000/",
+  baseURL: "http://134.122.115.78:8000/",
+  // baseURL: "http://127.0.0.1:8000/",
 });
 
 const vpnapi = axios.create({

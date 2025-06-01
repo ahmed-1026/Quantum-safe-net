@@ -21,7 +21,10 @@ async def send_message(ip, type, message):
             sid = connected_clients[ip]
             await sio.emit(type, message, room=sid)
             print(f"Message sent to {ip}: {message}")
+            return True
         else:
             print(f"Client {ip} not connected")
+            return False
     except Exception as e:
         print(f"Error sending message to {ip}: {e}")
+        return False

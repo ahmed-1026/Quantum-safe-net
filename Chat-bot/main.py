@@ -5,6 +5,7 @@ from sentence_transformers import SentenceTransformer
 from openai import OpenAI
 import json
 
+# with open('/root/Quantum-safe-net/Chat-bot/config.json', 'r') as file:
 with open('config.json', 'r') as file:
     config = json.load(file)
 
