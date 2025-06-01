@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { EyeIcon, EyeOffIcon } from 'lucide-react';
+import { EyeIcon, EyeOffIcon, AlertCircle, CheckCircle, X, WifiOff } from 'lucide-react';
 import { login } from '../../apiService';
+import Alert from '../../components/Shared/alert'
 
 const LoginPage = ({ onLogin }) => {
   const navigate = useNavigate();
@@ -10,6 +11,14 @@ const LoginPage = ({ onLogin }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [alert, setAlert] = useState(null);
+
+  const showAlert = (type, title, message, duration = 5000) => {
+    setAlert({ type, title, message });
+    if (duration > 0) {
+      setTimeout(() => setAlert(null), duration);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,12 +40,16 @@ const LoginPage = ({ onLogin }) => {
         localStorage.setItem('userRole', response?.data?.role);
         console.log("userRole", response?.data?.role);
 
+        // Add this success alert
+        showAlert('success', 'Login Successful', 'Welcome! Redirecting to dashboard...', 2000);
+
         // Navigate to the dashboard
         onLogin(response?.data?.role);
         navigate('/dashboard');
       } else {
         // Handle unexpected API response
         const message = response?.response?.data?.detail;
+        showAlert('error', 'Login Failed', message);
         setError('Login failed. Please try again.');
       }
     } catch (err) {
@@ -62,6 +75,15 @@ const LoginPage = ({ onLogin }) => {
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
         <h2 className="text-xl font-bold text-center mb-2">Welcome Back</h2>
         <p className="text-gray-500 text-center mb-6">Sign in to your account to continue</p>
+
+        {alert && (
+          <Alert 
+            type={alert.type} 
+            title={alert.title} 
+            message={alert.message}
+            setAlert = {setAlert}
+          />
+        )}
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
@@ -119,9 +141,14 @@ const LoginPage = ({ onLogin }) => {
 
           <button
             type="submit"
-            className="w-full bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+            disabled={loading}
+            className={`w-full py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all ${
+              loading
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-red-500 hover:bg-red-600'
+            } text-white`}
           >
-            LOGIN
+            {loading ? 'SIGNING IN...' : 'LOGIN'}
           </button>
         </form>
 
