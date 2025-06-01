@@ -43,9 +43,8 @@ class CRUDWGKey(CRUDBase[WGKey, WGKeyCreate, WGKeyUpdate]):
         server.last_used_ip = client_ip
         # add to wireguard server
         await send_message(server.server_ip, "add-client", {
-            "interface": server.interface,
             "client_public_key": client_public_key,
-            "allowed_ips": "0.0.0.0/0"
+            "client_ip": client_ip
         })
         db_obj = WGKey(
             user_id=user_id,
