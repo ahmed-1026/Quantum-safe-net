@@ -1,8 +1,8 @@
 // src/components/Dashboard.jsx
 import React, { useState, useEffect } from "react";
 import { QRCodeCanvas } from "qrcode.react";
-import { FaQrcode, FaCog } from "react-icons/fa";
-import { getData, postData } from "../../apiService";
+import { FaQrcode, FaCog, FaTrash } from "react-icons/fa";
+import { getData, postData, deleteData } from "../../apiService";
 
 
 const EmployeeDashboard = () => {
@@ -10,6 +10,7 @@ const EmployeeDashboard = () => {
   const [servers, setServers] = useState([]);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [config, setConfig] = useState(null);
+  const [configId, setConfigId] = useState(null);
 
   useEffect(() => {
       const fetchUsers = async () => {
@@ -45,8 +46,9 @@ const EmployeeDashboard = () => {
     setCurrentServer(server);
     try {
       const response = await getData(`/wgkey/${server_id}/config`);
-      console.log("Data: ", response?.data.configuration);
+      console.log("Data: ", response?.data);
       setConfig(response?.data.configuration);
+      setConfigId(response?.data.id);
       setIsImageModalOpen(true);
     } catch (error) {
       console.error('Error fetching server config:', error);
@@ -68,6 +70,21 @@ const EmployeeDashboard = () => {
       console.error('Error fetching server config:', error);
     }
   }
+
+  const deleteWireguardConfig = async (server_id) => {
+    console.log("Server ID: ", server_id);
+    var server = servers.find((server) => server.id === server_id);
+    setCurrentServer(server);
+    try {
+      const response = await deleteData(`/wgkey/${configId}`);
+      console.log("Data: ", response?.data);
+      setConfig(null);
+      setIsImageModalOpen(false);
+    } catch (error) {
+      console.error('Error deleting server config:', error);
+    }
+  }
+
   return <div>
     Welcome to the Dashboard!
     <h1 className="text-2xl font-bold">Welcome, {user?.full_name || 'User'}!</h1>
@@ -109,6 +126,9 @@ const EmployeeDashboard = () => {
                 <td className="py-3 px-4">
                   <button className="mr-2" onClick={() => wireguardCong(server.id)}>
                     <FaCog className="text-green-500" />
+                  </button>
+                  <button className="mr-2" onClick={() => deleteWireguardConfig(server.id)}>
+                    <FaTrash className="text-red-500" />
                   </button>
                 </td>
               </tr>

@@ -96,7 +96,7 @@ def wire_guard_setup(
     SERVER_PRIV_KEY: str,
     wg_ip_v4: str = "10.0.0.1", 
     SERVER_WG_NIC: str = "wg0",
-    SERVER_PORT: int = "51820",
+    SERVER_PORT: int = 51820,
     ):
     """
     Set up WireGuard server.

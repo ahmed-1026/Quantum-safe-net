@@ -49,6 +49,26 @@ export const postData = async (endpoint, data) => {
   }
 };
 
+export const deleteData = async (endpoint) => {
+  try {
+    const token = localStorage.getItem('authToken');
+    const response = await api.delete(endpoint, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response;
+  } catch (error) {
+    console.error('API GET Error:', error);
+    const status = error?.response?.status;
+    console.log("Error status: ", status)
+    console.log("Error message: ", error?.response)
+    if (status === 401 || status === 403) {
+      handleUnauthorized();
+    }
+  }
+};
+
 export const createUser = async (userData) => {
   try {
     console.log("User data: ", userData);
@@ -204,7 +224,7 @@ export const startServer = async (serverId) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    return response.data;
+    return response;
   } catch (error) {
     console.error('API GET Error:', error);
     const status = error?.response?.status;

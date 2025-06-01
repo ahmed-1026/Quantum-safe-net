@@ -95,7 +95,7 @@ def read_wg_config(
             Endpoint = {server.server_ip}:{server.server_port}
             AllowedIPs = 0.0.0/0, ::/0
             """)
-        return JSONResponse(content={"configuration": configuration})
+        return JSONResponse(content={"id": wgkey.id,"configuration": configuration})
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to get wg configuration: {str(e)}")
 

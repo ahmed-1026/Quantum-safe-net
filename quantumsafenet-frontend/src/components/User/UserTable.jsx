@@ -116,9 +116,9 @@ const UserTable = () => {
                 <td className="py-3 px-4">{user.location}</td>
                 <td className="py-3 px-4">{user.trustscore}</td>
                 <td className="py-3 px-4">
-                  <button className="mr-2" onClick={() => handleConfig(user.vpnconfig)}>
+                  {/* <button className="mr-2" onClick={() => handleConfig(user.vpnconfig)}>
                     <FaQrcode className="text-blue-500" />
-                  </button>
+                  </button> */}
                   <button className="mr-2" onClick={() => handleEdit(user)}>
                     <FaEdit className="text-blue-500" />
                   </button>
